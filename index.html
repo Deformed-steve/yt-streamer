@@ -1,28 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>YouTube Stream Player</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    input {
+      width: 60%;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #ff4444;
+      color: #fff;
+      cursor: pointer;
+    }
+    video {
+      margin-top: 20px;
+      max-width: 90%;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+    }
+  </style>
 </head>
-<body style="background:#111; color:#fff; font-family:sans-serif; text-align:center;">
-  <h2>Play YouTube Stream</h2>
-  <input type="text" id="ytUrl" placeholder="Enter YouTube URL" size="50">
-  <button onclick="loadVideo()">Play</button>
-  
-  <br><br>
-  <video id="player" width="640" height="360" controls></video>
+<body>
+  <h1>YouTube Stream Player</h1>
+  <input id="ytUrl" type="text" placeholder="Enter YouTube URL here">
+  <button onclick="loadStream()">Load Video</button>
+  <video id="player" controls autoplay></video>
 
   <script>
-    async function loadVideo() {
+    async function loadStream() {
       const url = document.getElementById("ytUrl").value;
-      const res = await fetch(`http://localhost:3000/api/getStream?url=${encodeURIComponent(url)}`);
-      const data = await res.json();
-      if (data.streamUrl) {
-        const player = document.getElementById("player");
-        player.src = data.streamUrl;
-        player.play();
-      } else {
-        alert("Error: " + (data.error || "No stream"));
+      const player = document.getElementById("player");
+      player.src = "";
+
+      try {
+        const res = await fetch(`/api/getStream?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+
+        if (data.streamUrl) {
+          player.src = data.streamUrl;
+          player.play();
+        } else {
+          alert("Error: " + (data.error || "Could not load video"));
+        }
+      } catch (err) {
+        alert("Request failed: " + err.message);
       }
     }
   </script>
