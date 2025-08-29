@@ -1,34 +1,26 @@
-const express = require("express");
-const ytdl = require("ytdl-core");
-const cors = require("cors");
+import ytdl from "ytdl-core";
 
-const app = express();
-app.use(cors());
-
-// API: /api/getStream?url=YOUTUBE_URL
-app.get("/api/getStream", async (req, res) => {
+export default async function handler(req, res) {
   try {
-    const url = req.query.url;
-    if (!url) return res.status(400).json({ error: "Missing ?url=" });
+    const { url } = req.query;
 
-    // Validate YouTube URL
-    if (!ytdl.validateURL(url)) {
+    if (!url || !ytdl.validateURL(url)) {
       return res.status(400).json({ error: "Invalid YouTube URL" });
     }
 
     // Get video info
     const info = await ytdl.getInfo(url);
-    const format = ytdl.chooseFormat(info.formats, { quality: "18" }); // mp4 360p
+
+    // Pick the best mp4 stream (you can change to audio only if you want)
+    const format = ytdl.chooseFormat(info.formats, { quality: "18" });
+
     if (!format || !format.url) {
-      return res.status(404).json({ error: "No valid stream found" });
+      return res.status(404).json({ error: "No stream found" });
     }
 
-    res.json({ streamUrl: format.url });
+    return res.status(200).json({ streamUrl: format.url });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error", details: err.message });
+    return res.status(500).json({ error: err.message });
   }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+}
