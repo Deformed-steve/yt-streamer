@@ -1,56 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YouTube Streamer</title>
-  <style>
-    body {
-      background: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    video {
-      width: 80%;
-      height: auto;
-      border-radius: 12px;
-      margin-top: 20px;
-    }
-    input {
-      width: 60%;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>YouTube Stream Player</title>
 </head>
-<body>
-  <h1>YouTube Video Streamer</h1>
-  <input type="text" id="url" placeholder="Paste YouTube URL" />
-  <video id="player" controls></video>
+<body style="background:#111; color:#fff; font-family:sans-serif; text-align:center;">
+  <h2>Play YouTube Stream</h2>
+  <input type="text" id="ytUrl" placeholder="Enter YouTube URL" size="50">
+  <button onclick="loadVideo()">Play</button>
+  
+  <br><br>
+  <video id="player" width="640" height="360" controls></video>
 
   <script>
-    const input = document.getElementById("url");
-    const player = document.getElementById("player");
-
-    input.addEventListener("change", async () => {
-      const ytUrl = input.value;
-      const res = await fetch(`/api/getStream?url=${encodeURIComponent(ytUrl)}`);
+    async function loadVideo() {
+      const url = document.getElementById("ytUrl").value;
+      const res = await fetch(`http://localhost:3000/api/getStream?url=${encodeURIComponent(url)}`);
       const data = await res.json();
-
       if (data.streamUrl) {
+        const player = document.getElementById("player");
         player.src = data.streamUrl;
         player.play();
       } else {
-        alert("Failed to fetch video");
+        alert("Error: " + (data.error || "No stream"));
       }
-    });
+    }
   </script>
 </body>
 </html>
