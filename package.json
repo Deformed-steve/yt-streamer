@@ -1,8 +1,8 @@
 {
-  "name": "youtube-streamer",
+  "name": "yt-stream-player",
   "version": "1.0.0",
-  "type": "module",
+  "main": "index.js",
   "dependencies": {
-    "@distube/ytdl-core": "^4.11.7"
+    "ytdl-core": "^4.11.5"
   }
 }
